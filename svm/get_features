@@ -1,0 +1,50 @@
+import numpy as np
+import pandas as pd
+import csv
+
+#写成csv文件较好处理  将loop_metrics.txt 和 roles_metrics.txt处理成一个文件 csv
+#csv 一行长度为47
+
+def get_features():
+    file1 = open('data/loops_metrics.txt', 'r')
+    file2 = open('data/roles_metrics.txt', 'r')
+    #filename_new = 'data_processed/' + 'loop_roles_metrics.txt'
+    #file_new = open(filename_new, 'w', newline='')
+    csvFile = open("data_processed/loop_roles_metrics.csv", "w", newline='')
+    writer = csv.writer(csvFile)
+    file1_rows = file1.readlines()
+    file2_rows = file2.readlines()
+    writer.writerow(
+        ["filename", "index", "bounded", "terminating", "simple", "tnont", "hard", "fpcalls", "fpargs", "cfgblocks",
+         "maxindeg","SYNT_CONST", "CONST_ASSIGN", "COUNTER", "PURE_COUNTER", "LINEAR"
+            , "PURE_LINEAR", "BOOL", "PURE_BOOLEAN", "COMPARED_TO_CONST", "MODE", "LOOP_IT"
+            , "LOOP_BOUND", "ARRAY_INDEX","OFFSET", "ARRAY_SIZE", "FILE_DESCR", "INPUT", "BRANCH_COND", "BITVECTOR"
+            , "CHAR", "UNRES_DATA", "SCALAR_INT", "SCALAR_FLOAT","SCALAR", "PTR", "PTR_SCALAR"
+            , "PTR_STRUCT", "PTR_STRUCT_PTR", "PTR_STRUCT_REC", "PTR_COMPL_STRUCT_REC", "HEAP_PTR", "THREAD_DESCR"
+            , "USED_IN_ARITHM", "EXTERNAL_VAR"," RECURSIVE_FUNC", "STRUCT_FIELD"])  # 写入列的名称  先loop后role
+    i =1
+    for line1 in file1_rows:
+        curLine = line1.strip().split(" ")
+        line2 = file2_rows[i - 1]  # 从0开始同步  roles的列表
+        curLine2 = line2.strip().split(" ")
+
+        if(i>1):
+            writer.writerow(
+                [curLine[0], i - 1, curLine[1], curLine[2], curLine[3], curLine[4], curLine[5], curLine[6], curLine[7],
+                 curLine[8], curLine[9], curLine2[1], curLine2[2], curLine2[3], curLine2[4], curLine2[5], curLine2[6],
+                 curLine2[7],
+                 curLine2[8], curLine2[9], curLine2[10], curLine2[11], curLine2[12], curLine2[13], curLine2[14],
+                 curLine2[15], curLine2[16],
+                 curLine2[17], curLine2[18], curLine2[19], curLine2[20], curLine2[21], curLine2[22], curLine2[23],
+                 curLine2[24], curLine2[25],
+                 curLine2[26], curLine2[27], curLine2[28], curLine2[29], curLine2[30], curLine2[31], curLine2[32],
+                 curLine2[33], curLine2[34],
+                 curLine2[35], curLine2[36]])
+
+        i += 1
+
+    file1.close()
+    file2.close()
+    csvFile.close()
+
+get_features()
