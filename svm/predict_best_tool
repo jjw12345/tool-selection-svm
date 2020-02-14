@@ -1,0 +1,54 @@
+import numpy as np
+from sklearn.svm import SVC
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import GridSearchCV, train_test_split
+from sklearn.externals import joblib
+
+def pretect_best_tool(v):
+    tool = ['blast', 'cbmc', 'cpachecker', 'cpalien', 'cseq-lazy', 'cseq-mu', 'esbmc', 'fbit',
+            'llbmc', 'predator', 'symbiotic', 'threader', 'ufo', 'ultimateAutomizer',
+            'ultimateKojak']
+    # 加载模型。
+    model = joblib.load('model/svm_model_weight.pkl')
+    #加载v的特征。
+    pot = 0
+    index = 0
+    print(v.shape)
+    for i in range(15):
+        x = np.append(v,i+1)
+        a =max(model.predict_proba([x]))
+        b=max(a)
+        if(b>pot):
+            pot = b
+            index =i+1
+
+    return index
+
+
+
+
+
+
+if __name__ == '__main__':
+    filename = 'data_processed/loop_roles_metrics.csv'
+    data = np.genfromtxt(filename, delimiter=',', skip_header=1)   #测试的文件应该是文件名  特征  无其他的特征。  loop
+    file1 = open('data/loops_metrics.txt', 'r')
+    file1_rows = file1.readlines()
+    print(data.shape)
+    x = data[1:,2:47].astype(float)  # 数据特征  这里48
+    j=1
+    file2 = open('data/num_scores.txt', 'r')
+    file2_rows = file2.readlines()
+    score = 0
+    for i in x:
+        line1 = file1_rows[j]  # 从0开始同步  roles的列表
+        curLine1 = line1.strip().split(" ")
+        line2 = file2_rows[j]
+        curLine2 = line2.strip().split(" ")
+        tool =pretect_best_tool(i)
+        print(curLine2[tool])
+        score = score + int(curLine2[tool])
+        j = j+1
+
+
+    print(score)
