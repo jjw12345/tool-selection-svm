@@ -1,0 +1,40 @@
+import numpy as np
+import os
+import math
+
+'''
+author = jiangjiawei
+2019 8 23
+'''
+#主要操作 读写txt
+
+
+def answer_processed(t):
+    filename_old = 'data/'+t + '_answers_normalised.txt'
+    filename_new = 'data_processed/'+t +'_new_normal_answers.txt'
+    file_old = open(filename_old,'r')
+    file_new = open(filename_new,'w',newline='')
+    lines = file_old.readlines() #所有列表
+    cont=''
+    for line in lines:
+        z = line.strip().split(' ')
+        if(z[1]=='true' or z[1]=='false'):
+            if(z[1] in z[0]):
+                 cont = z[0]+' '+'true'
+            else:
+                cont = z[0]+' '+'false'
+        else:
+            cont = z[0]+' '+z[1]
+        file_new.write(cont)
+        file_new.write('\r\n')
+
+    file_old.close()
+    file_new.close()
+
+
+#可行 就是不是用原先的answer进行读  需要处理的。
+
+tools = ['blast', 'cbmc', 'cpachecker', 'cpalien', 'cseq-lazy', 'cseq-mu', 'esbmc', 'fbit', 'llbmc',
+           'predator', 'symbiotic', 'threader', 'ufo', 'ultimateAutomizer', 'ultimateKojak']
+for t in tools:
+    answer_processed(t)
