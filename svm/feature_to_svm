@@ -1,0 +1,53 @@
+import numpy as np
+import pandas as pd
+import csv
+
+
+def feature_to_svm(filename,num):
+    # 所有工具都要读一遍
+    #定义写文件
+    csvFile = open(filename, "w", newline='')  # 这样写 可行  避免空行
+    writer = csv.writer(csvFile)
+    #写文件的标题：
+    writer.writerow(
+        ["file", "bounded", "terminating", "simple", "tnont", "hard", "fpcalls", "fpargs", "cfgblocks",
+         "maxindeg","SYNT_CONST", "CONST_ASSIGN", "COUNTER", "PURE_COUNTER", "LINEAR"
+        , "PURE_LINEAR", "BOOL", "PURE_BOOLEAN", "COMPARED_TO_CONST", "MODE", "LOOP_IT"
+         , "LOOP_BOUND", "ARRAY_INDEX","OFFSET", "ARRAY_SIZE", "FILE_DESCR", "INPUT", "BRANCH_COND",
+         "BITVECTOR", "CHAR", "UNRES_DATA", "SCALAR_INT", "SCALAR_FLOAT","SCALAR", "PTR", "PTR_SCALAR"
+            , "PTR_STRUCT", "PTR_STRUCT_PTR", "PTR_STRUCT_REC", "PTR_COMPL_STRUCT_REC", "HEAP_PTR", "THREAD_DESCR"
+            , "USED_IN_ARITHM", "EXTERNAL_VAR"," RECURSIVE_FUNC", "STRUCT_FIELD","type", "tool_index","weight","label"])
+
+    #长度50
+    #type  值先都默认为1。  后面修改在get_feature.py里改。  属于文件的特征。
+    csv_reader = csv.reader(open('data_processed/data_svm.csv'))  # 读loop_roles文件
+    csv_reader1 = list(csv_reader)  #必须这样处理  要不然同一个地址。  这点可以总结学习。
+    i=0
+    for row in csv_reader1:
+        if(i>=1):
+            if(int(num) == int(row[49])):
+                row[49]=1
+                writer.writerow([row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],
+                                 row[11],row[12],row[13],row[14],row[15],row[16],row[17],row[18],row[19],row[20],
+                                 row[21],row[22],row[23],row[24],row[25],row[26],row[27],row[28],row[29],row[30],
+                                 row[31],row[32],row[33],row[34],row[35],row[36],row[37],row[38],row[39],row[40],
+                                 row[41],row[42],row[43],row[44],row[45],row[46],row[47],row[48],row[49]])
+            else:
+                row[49]=-1
+                writer.writerow([row[0],row[1],row[2],row[3],row[4],row[5],row[6],row[7],row[8],row[9],row[10],
+                                 row[11],row[12],row[13],row[14],row[15],row[16],row[17],row[18],row[19],row[20],
+                                 row[21],row[22],row[23],row[24],row[25],row[26],row[27],row[28],row[29],row[30],
+                                 row[31],row[32],row[33],row[34],row[35],row[36],row[37],row[38],row[39],row[40],
+                                 row[41],row[42],row[43],row[44],row[45],row[46],row[47],row[48],row[49]])
+        i=i+1
+
+    csvFile.close()
+
+
+if __name__ == '__main__':
+    for i in range(3):
+        j= i+1
+        filename = 'data_processed/'+'data_svm'+str(j)+'.csv'
+        feature_to_svm(filename,j)
+
+    print('文件创建完毕！')
