@@ -1,0 +1,135 @@
+import numpy as np
+import pandas as pd
+import csv
+import math
+
+
+#W(v,t) = potentional(v)*Criticality(v)*perforance(t,cat(v))*speed(t,cat(v))
+
+#求一个任务v（f p t）的最大得分和最小得分。  我这里先以f为一个v
+def Potentional(v,t):
+    file = open('data/num_scores.txt', 'r') #读文件
+    file1_rows = file.readlines()  
+    line = file1_rows[0]
+    curLine = line.strip().split(" ")
+    #print(curLine)  #字符类型的列表
+    a=curLine.index(t) #索引  返回列表中某个值得索引。
+    score = []  #保存一行分数的列表
+    # 索引遍历
+    i = 0
+    for line1 in file1_rows:
+        i +=1
+        if(i>1):
+           curLine1 = line1 .strip().split(' ')
+           #f = curLine1[0].strip().split('/')  
+           #print(f)
+           if(v==curLine1[0]):
+               for j in range(len(curLine1)):
+                   if(j>=1):
+                       score.append(int(curLine1[j]))   #这里需要进行类型转换 将str转换成int
+
+    return max(score) - min(score)
+
+#p =Potentional('bitvector-regression/implicitfloatconversion_false.i','cbmc')
+#print(p)
+
+#能正确回答v的工具的个数  即answer v为1的个数。
+def criticality(v):
+    cr_num =0
+    tool = ['blast','cbmc','cpachecker','cpalien','cseq-lazy','cseq-mu','esbmc','fbit','llbmc','predator','symbiotic','threader','ufo','ultimateAutomizer'
+            ,'ultimateKojak']
+    for i in range(len(tool)):
+        filename = 'data/'+tool[i]+'_answers.txt'  #连接成具体的文件名
+        file = open(filename, 'r')  # 读文件
+        file1_rows = file.readlines()  # 读文件的所有行。
+        for line in  file1_rows:
+            curLine1 = line.strip().split(' ')
+            if(curLine1[0]==v):
+                if(curLine1[1]=='true' or curLine1[1]=='false'):
+                    cr_num = cr_num + 1
+
+        if(i==1):
+            break
+
+    return cr_num
+
+
+c=criticality('eca/Problem02_10_true.c')  #这个可行的。
+print(c)
+
+#工具t在c类的总得分除以最好工具在c类的总得分（平均值也是一样的  会自动约去）
+# 在这一块 我得把得分num_score文件进行划分。确定t。  不用确定也行。  不用划分
+def performance(t,v):
+    c = v.strip().split('/')  #先拿到文件名的种类。
+    cat = c[0]  #拿到category
+    filename = 'data/'+'num_scores.txt'
+
+    file = open(filename, 'r')  # 读文件
+    file_rows = file.readlines()  # 读文件的所有行。
+    #确定t的索引位
+    line = file_rows[0]  #一行的字符串
+    curLine = line.strip().split(" ")  #一行的列表
+    t_index = curLine.index(t)  #工具t的索引。  其实也不需要
+    str = ['blast','cbmc','cpachecker','cpalien','cseq-lazy','cseq-mu','esbmc','fbit','llbmc',
+            'predator','symbiotic','threader','ufo','ultimateAutomizer','ultimateKojak']
+    dict = {'blast':0,'cbmc':0,'cpachecker':0,'cpalien':0,'cseq-lazy':0,'cseq-mu':0,'esbmc':0,'fbit':0,'llbmc':0,
+            'predator':0,'symbiotic':0,'threader':0,'ufo':0,'ultimateAutomizer':0,'ultimateKojak':0}
+    for line in  file_rows:
+        curLine = line.strip().split(' ')#得到列表
+        z = curLine[0].strip().split('/')
+        if(z[0]==cat):
+            i =1
+            for k in str:
+                dict[k] +=int(curLine[i])  #字典遍历的方法。
+                i +=1
+            i=1
+
+    t_score = dict[t]
+    max_score = max(dict.values())
+    p = t_score/max_score
+    return p
+
+#print(performance('cbmc','bitvector-regression/integerpromotion_false.i'))  #可行。
+
+#用来求速度之比。
+def speed(t,v):
+    c = v.strip().split('/')  # 先拿到文件名的种类。
+    cat = c[0]  # 拿到category
+    filename = 'data/' + 'times.txt'
+    file = open(filename, 'r')  # 读文件
+    file_rows = file.readlines()  # 读文件的所有行。
+
+    #第一步 求cat_time
+    str = ['blast', 'cbmc', 'cpachecker', 'cpalien', 'cseq-lazy', 'cseq-mu', 'esbmc', 'fbit', 'llbmc',
+           'predator', 'symbiotic', 'threader', 'ufo', 'ultimateAutomizer', 'ultimateKojak']
+    dict = {'blast': 0, 'cbmc': 0, 'cpachecker': 0, 'cpalien': 0, 'cseq-lazy': 0, 'cseq-mu': 0, 'esbmc': 0, 'fbit': 0,
+            'llbmc': 0,'predator': 0, 'symbiotic': 0, 'threader': 0, 'ufo': 0, 'ultimateAutomizer': 0, 'ultimateKojak': 0}
+
+    for line in  file_rows:
+        curLine = line.strip().split(' ')#得到列表
+        z = curLine[0].strip().split('/')
+        if(z[0]==cat):
+            i =1
+            for k in str:
+                dict[k] +=float(curLine[i])  
+                i +=1
+            i=1
+
+    t_time = dict[t]
+    cat_time = 0
+    for j in dict.values():
+        cat_time +=j
+
+
+    rel_time = t_time/cat_time
+    fast_time = min(dict.values())
+    rel_fast_time = fast_time/cat_time
+
+    print(cat_time)
+    print(t_time)
+    print(fast_time)
+
+    return math.log(rel_time)/math.log(rel_fast_time)
+
+#print(speed('cbmc','bitvector-regression/integerpromotion_false.i'))
+
