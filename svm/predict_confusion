@@ -1,0 +1,32 @@
+from sklearn.externals import joblib
+import numpy as np
+#from imblearn.combine import
+from sklearn.metrics import classification_report
+import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
+
+
+def predict_confusion():
+    filename ='data_ex/splitData/TestingData1.csv'
+    data = np.genfromtxt(filename, delimiter=',', skip_header=1)
+
+    x = data[:, 0:46].astype(float)  # 数据特征  前面代表行数  后面代表  列数。  总长度长度为50  这里48
+    y = data[:, 47].astype(int)  # 标签  这里有个注意的  不要取权重
+    model1 = joblib.load('model/svm_model_weight.pkl')
+    print(classification_report(y,model1.predict(x)))
+
+    confusion = confusion_matrix(y,model1.predict(x))
+    #plt.imshow(confusion, cmap=plt.cm.Blues)
+    print(confusion)
+    correct =0
+    for i in range(len(x)):
+        #print(i)
+        if(model1.predict([x[i]])==y[i]):
+            correct +=1
+        #print(model1.predict([x[i]]))
+        #print(model1.predict_proba([x[i]]))  #这种是可行的。  这种方案可行的。
+    total = len(x)
+    print('accuracy:',correct/total)  # 代码没问题
+
+
+predict_confusion()
